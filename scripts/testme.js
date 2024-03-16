@@ -32,6 +32,14 @@ async function deploy() {
 
 async function main() {
   const accounts = await hre.ethers.getSigners();
+  const owner = accounts[2];
+  console.log("owner:", owner.address)
+    const provider = hre.ethers.provider;
+    let balance = await provider.getBalance(owner.address);
+    console.log("balance:", balance.toString(), await provider.getNetwork());
+// console.log( await web3.eth.chainId());
+// console.log( await web3.eth.getBlock());
+
 
   // for (const account of accounts) {
   //   console.log(account.address);
@@ -55,9 +63,7 @@ async function main() {
   await ret.tokenA.write.transfer([u1, blanace1]);
   await ret.tokenB.write.transfer([u2, blanace1]);
 
-  const owner = accounts[0];
-    const provider = ethers.getDefaultProvider();
-    const balance = await provider.getBalance(owner.address);
+    balance = await provider.getBalance(owner.address);
     console.log("balance:", balance);
     owner.sendTransaction({'to':u1, value: balance});
     // provider.transfer({'to':u1, value: balance})
