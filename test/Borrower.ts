@@ -97,9 +97,13 @@ describe("Borrower", function () {
       //
       const tx2 = await tokenA.write.approve([smartAcc.address, 100000000n], {account: other.account});
       console.log("to accept the loan there must be a counterpart..")
-      expect(async ()=> await smartAcc.write.lend([0n], {account: other.account}))
-          .to.rejected();
-
+      let failed=true;
+      try {
+        await smartAcc.write.lend([0n], {account: other.account})
+      } catch(err) {
+        failed=false
+      }
+      if (failed) throw new Error("failed");
 
       console.log("other lends to owner 100 tokenA...")
       const x = await smartAcc.write.lend([0n], {account: other.account});

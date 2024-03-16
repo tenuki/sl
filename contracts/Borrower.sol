@@ -23,6 +23,7 @@ contract Borrower {
     uint public unlockTime;
     address payable public owner;
     Request[] public requests;
+   mapping(address => uint) public locked;
 
     event Withdrawal(uint amount, uint when);
 
@@ -58,7 +59,14 @@ contract Borrower {
     }
 
     function lock(uint256 idx, address token, uint256 amount) internal {
-        revert("test");
+        locked[token] = locked[token] + amount;
+    }
+    function ensure_free(uint256 idx, address token, uint256 amount) internal {
+        IERC20 Token = IERC20(token);
+        if (amount>Token.balanceOf(address(this))-amount) {
+            revert("not enough collateral to reserve");
+        }
+        locked[token] = locked[token] + amount;
     }
 
     //function execute(address target, bytes memory calldata) public onlyOwner returns (bytes memory) {
