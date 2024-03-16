@@ -47,25 +47,21 @@ describe("Borrower", function () {
 
 
   describe("My Borrower Deployment", function () {
-    it("Setup", async function () {
+    it("Setup request", async function () {
       const { otherAccount, owner, tokenA,
         tokenB, smartAcc } = await loadFixture(myDeployOneYearLockFixture);
-      // console.error(tokenA)
 
       const tx1 = await smartAcc.write.createRequest([tokenA.address, 100n, tokenB.address, 10n]);
       console.log('pedidos:', await smartAcc.read.pendingRequests());
 
-
-    let blanace = await tokenA.read.balanceOf([otherAccount.account.address]);
-    console.log('tokenAbalance of other account:', blanace);
+      //  give lend
+      let blanace = await tokenA.read.balanceOf([otherAccount.account.address]);
+      console.log('tokenAbalance of other account:', blanace);
       const tx2 = await tokenA.write.approve([smartAcc.address, 100000000n], {account: otherAccount.account});
-    console.log('tx2:', tx2);
-    console.log( 'owner:', owner.account.address);
-    console.log( 'otherwallet:', otherAccount.account.address);
-
+      // console.log('tx2:', tx2);
+      console.log( 'owner:', owner.account.address);
+      console.log( 'otherwallet:', otherAccount.account.address);
       const x = await smartAcc.write.lend([0n], {account: otherAccount.account});
-
-      // expect(await lock.read.unlockTime()).to.equal(unlockTime);
     });
 
   });

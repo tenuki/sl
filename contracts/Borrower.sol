@@ -14,6 +14,10 @@ struct Request {
     uint256 offeredAmount;
 }
 
+struct Call {
+    address target;
+    bytes callData;
+}
 
 contract Borrower {
     uint public unlockTime;
@@ -50,6 +54,19 @@ contract Borrower {
         request = requests[idx];
         IERC20 tokenRequested = IERC20(request.requestedToken);
         tokenRequested.transferFrom(msg.sender, address(this), request.requestedAmount);
+    }
+
+    //function execute(address target, bytes memory calldata) public onlyOwner returns (bytes memory) {
+    function execute(address target, bytes memory xdata) public onlyOwner returns (bytes memory) {
+        (bool success, bytes memory ret) = target.call(xdata);
+        if (success) {
+            verify();
+        }
+        return ret;
+    }
+
+    function verify() internal returns(bool) {
+        return true;
     }
 
     function withdraw() public {

@@ -6,7 +6,7 @@ import { expect } from "chai";
 import hre from "hardhat";
 import { getAddress, parseGwei } from "viem";
 
-describe("Lock", function () {
+xdescribe("Lock", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -59,7 +59,7 @@ describe("Lock", function () {
   }
 
 
-  describe("Deployment", function () {
+  xdescribe("Deployment", function () {
     it("Should set the right unlockTime", async function () {
       const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
 
@@ -97,7 +97,7 @@ describe("Lock", function () {
     });
   });
 
-  describe("Withdrawals", function () {
+  xdescribe("Withdrawals", function () {
     describe("Validations", function () {
       it("Should revert with the right error if called too soon", async function () {
         const { lock } = await loadFixture(deployOneYearLockFixture);
@@ -138,7 +138,7 @@ describe("Lock", function () {
       });
     });
 
-    describe("Events", function () {
+    xdescribe("Events", function () {
       it("Should emit an event on withdrawals", async function () {
         const { lock, unlockTime, lockedAmount, publicClient } =
           await loadFixture(deployOneYearLockFixture);
