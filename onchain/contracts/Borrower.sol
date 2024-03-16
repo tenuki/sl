@@ -17,8 +17,9 @@ struct Request {
 contract Borrower {
     uint public unlockTime;
     address payable internal owner;
-    Request[] public requests;
-   mapping(address => uint) public locked;
+    Request[] internal requests;
+    mapping(address => uint) public locked;
+    address[] internal tokens;
 
     event Withdrawal(uint amount, uint when);
 
@@ -55,6 +56,18 @@ contract Borrower {
         IERC20 tokenRequested = IERC20(request.requestedToken);
         tokenRequested.transferFrom(msg.sender, address(this), request.requestedAmount);
         lock(idx, request.offeredToken, request.offeredAmount);
+        add_token_to_mapped(request.offeredToken);
+    }
+
+    function add_token_to_mapped(address token) internal {
+        for(uint256 idx=0;idx<tokens.length;idx++) {
+            if(tokens[idx]==token) {
+                //not to be added => nothing more must be done..
+                return ;
+            }
+        }
+        // elsewhere setup the token in the list...
+        tokens.push(token);
     }
 
     function lock(uint256 idx, address token, uint256 amount) internal {
@@ -72,15 +85,18 @@ contract Borrower {
     function execute(address target, bytes memory xdata) public onlyOwner returns (bytes memory) {
         (bool success, bytes memory ret) = target.call(xdata);
         if (success) {
-            if (!verify()) {
-                revert("unauthorized!!");
-            }
+            verify();
         }
         return ret;
     }
 
-    function verify() internal returns(bool) {
-        return true;
+    function verify() internal{
+        for(uint256 idx=0;idx<tokens.length;idx++) {
+            IERC20 Token = IERC20(tokens[idx]);
+            if (Token.balanceOf(address(this))<locked[address(Token)]) {
+                revert("transaction used locked collateral!");
+            }
+        }
     }
 
     function withdraw() public {

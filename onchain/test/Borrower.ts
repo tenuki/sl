@@ -150,7 +150,15 @@ describe("Borrower", function () {
             const tx3 = await smartAcc.write.execute([tokenA.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 1])]);
             await show(accs, toks);
 
+            // verify locking
             console.log("previous lend received must lock counterpart..")
+            failed = true;
+            try {
+                await smartAcc.write.execute([tokenB.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 1])]);
+            } catch (err) {
+                failed = false
+            }
+            if (failed) throw new Error("failed! function must revert and it doesnt!");
 
 
         });
