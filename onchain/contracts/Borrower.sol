@@ -14,26 +14,25 @@ struct Request {
     uint256 offeredAmount;
 }
 
-struct Call {
-    address target;
-    bytes callData;
-}
-
 contract Borrower {
     uint public unlockTime;
-    address payable public owner;
+    address payable internal owner;
     Request[] public requests;
    mapping(address => uint) public locked;
 
     event Withdrawal(uint amount, uint when);
 
-    constructor(uint _unlockTime) payable {
+    function getOwner() public returns(address) {
+        return owner;
+    }
+
+    constructor(address _owner) payable {
 //        require(
 //            block.timestamp < _unlockTime,
 //            "Unlock time should be in the future"
 //        );
 //        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+        owner = payable(_owner);
     }
 
     function createRequest(address requestedToken, uint256 requestedAmount ,
@@ -59,14 +58,14 @@ contract Borrower {
     }
 
     function lock(uint256 idx, address token, uint256 amount) internal {
+        ensure_free(token, amount);
         locked[token] = locked[token] + amount;
     }
-    function ensure_free(uint256 idx, address token, uint256 amount) internal {
+    function ensure_free(address token, uint256 amount) internal {
         IERC20 Token = IERC20(token);
-        if (amount>Token.balanceOf(address(this))-amount) {
+        if (amount>Token.balanceOf(address(this))-locked[token]) {
             revert("not enough collateral to reserve");
         }
-        locked[token] = locked[token] + amount;
     }
 
     //function execute(address target, bytes memory calldata) public onlyOwner returns (bytes memory) {
