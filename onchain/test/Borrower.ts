@@ -139,7 +139,7 @@ describe("Borrower", function () {
             console.error("*********************************")
             console.log("other lends to owner 100 tokenA...")
             await show(accs, toks);
-            const prepare = await tokenB.write.transfer([smartAcc.address, 10n],
+            const prepare = await tokenB.write.transfer([smartAcc.address, 11n],
                 {account: owner.account});
             await show(accs, toks);
             const x = await smartAcc.write.lend([0n], {account: other.account});
@@ -151,14 +151,17 @@ describe("Borrower", function () {
             await show(accs, toks);
 
             // verify locking
-            console.log("previous lend received must lock counterpart..")
+            console.log("previous lend received must lock counterpart: try to transfer locked must fail..")
             failed = true;
             try {
-                await smartAcc.write.execute([tokenB.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 1])]);
+                await smartAcc.write.execute([tokenB.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 2])]);
             } catch (err) {
                 failed = false
             }
             if (failed) throw new Error("failed! function must revert and it doesnt!");
+            // but unlocked is fine..
+            console.log("but unlocked should work..")
+            await smartAcc.write.execute([tokenB.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 1])]);
 
 
         });
