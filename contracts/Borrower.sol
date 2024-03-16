@@ -54,13 +54,20 @@ contract Borrower {
         request = requests[idx];
         IERC20 tokenRequested = IERC20(request.requestedToken);
         tokenRequested.transferFrom(msg.sender, address(this), request.requestedAmount);
+        lock(idx, request.offeredToken, request.offeredAmount);
+    }
+
+    function lock(uint256 idx, address token, uint256 amount) internal {
+        revert("test");
     }
 
     //function execute(address target, bytes memory calldata) public onlyOwner returns (bytes memory) {
     function execute(address target, bytes memory xdata) public onlyOwner returns (bytes memory) {
         (bool success, bytes memory ret) = target.call(xdata);
         if (success) {
-            verify();
+            if (!verify()) {
+                revert("unauthorized!!");
+            }
         }
         return ret;
     }
