@@ -68,7 +68,7 @@ async function main() {
   console.log("Setup!");
 }
 
-main().then(()=>{process.exit();}).catch((error) => {
+main().then(()=>{/*process.exit();*/}).catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
