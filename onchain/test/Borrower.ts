@@ -20,7 +20,7 @@ function objectsAreSame(x, y) {
 
 const _deploy = hre.viem.deployContract;
 
-async function show(accs, toks, prevState) {
+async function show(accs, toks, prevState=undefined) {
     const parts = [];
     const state = [];
     for (const acc of accs) {
