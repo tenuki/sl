@@ -159,11 +159,24 @@ describe("Borrower", function () {
                 failed = false
             }
             if (failed) throw new Error("failed! function must revert and it doesnt!");
+
             // but unlocked is fine..
             console.log("but unlocked should work..")
             await smartAcc.write.execute([tokenB.address, tokenIface.encodeFunctionData("transfer", [other.account.address, 1])]);
 
+            await show(accs, toks);
 
+            await smartAcc.write.pay([0, 5]);
+            await show(accs, toks);
+            const state = await smartAcc.read.getState([0]);
+            expect(objectsAreSame(state, [true, false])).to.be.true;
+            // console.log(state);
+
+            await smartAcc.write.pay([0, 5]);
+            const state_final = await smartAcc.read.getState([0]);
+            expect(objectsAreSame(state_final, [false, true])).to.be.true;
+
+            await show(accs, toks);
         });
 
     });
