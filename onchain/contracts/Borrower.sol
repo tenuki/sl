@@ -80,6 +80,27 @@ contract Borrower {
         require(request.lender!=0x0000000000000000000000000000000000000000, "no lender to transfer to..");
         require(request.offeredAmount>=request.returnedAmount+amount, "amount excess");
 
+        _return(idx, request, amount);
+    }
+
+    function claim(uint256 idx) public {
+        Request memory request = requests[idx];
+        require(request.inProgress==true, "request not in progress");
+        require(request.lender!=msg.sender, "wrong idx: sender!=lender");
+        IERC20 Token = IERC20(request.offeredToken);
+        _return(idx, request, locked[address(Token)]-request.returnedAmount);
+    }
+
+    function execute(address target, bytes memory xdata) public onlyOwner returns (bytes memory) {
+        (bool success, bytes memory ret) = target.call(xdata);
+        if (success) {
+            verify();
+        } // verify the not success case..
+        return ret;
+    }
+
+    // Internal functions..
+    function _return(uint256 idx, Request memory request, uint256 amount) internal {
         IERC20 Token = IERC20(request.offeredToken);
         Token.transfer(request.lender, amount);
 
@@ -91,14 +112,6 @@ contract Borrower {
             request.completed=true;
         }
         requests[idx] = request;
-    }
-
-    function execute(address target, bytes memory xdata) public onlyOwner returns (bytes memory) {
-        (bool success, bytes memory ret) = target.call(xdata);
-        if (success) {
-            verify();
-        } // verify the not success case..
-        return ret;
     }
 
     function add_token_to_mapped(address token) internal {
